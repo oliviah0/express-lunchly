@@ -46,7 +46,7 @@ class Customer {
          phone, 
          notes
        FROM customers
-       WHERE first_name ILIKE $1 OR last_name ILIKE $1
+       WHERE customer_tokens @@ to_tsquery($1)
        ORDER BY last_name, first_name`,
        [searchName]
     );
@@ -104,19 +104,21 @@ class Customer {
   /** save this customer. */
 
   async save() {
+    const fullName = this.firstName + ' ' + this.lastName
+    
     if (this.id === undefined) {
       const result = await db.query(
-        `INSERT INTO customers (first_name, last_name, phone, notes)
-             VALUES ($1, $2, $3, $4)
+        `INSERT INTO customers (first_name, last_name, phone, notes, customer_tokens)
+             VALUES ($1, $2, $3, $4, to_tsvector($5))
              RETURNING id`,
-        [this.firstName, this.lastName, this.phone, this.notes]
+        [this.firstName, this.lastName, this.phone, this.notes, fullName]
       );
       this.id = result.rows[0].id;
     } else {
       await db.query(
-        `UPDATE customers SET first_name=$1, last_name=$2, phone=$3, notes=$4
-             WHERE id=$5`,
-        [this.firstName, this.lastName, this.phone, this.notes, this.id]
+        `UPDATE customers SET first_name=$1, last_name=$2, phone=$3, notes=$4, customer_tokens=to_tsvector($5)
+             WHERE id=$6`,
+        [this.firstName, this.lastName, this.phone, this.notes, fullName, this.id]
       );
     }
   }

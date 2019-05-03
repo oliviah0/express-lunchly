@@ -8,7 +8,8 @@ CREATE TABLE customers (
     first_name text NOT NULL,
     last_name text NOT NULL,
     phone text,
-    notes text DEFAULT '' NOT NULL
+    notes text DEFAULT '' NOT NULL,
+    customer_tokens TSVECTOR
 );
 
 CREATE TABLE reservations (
