@@ -83,6 +83,7 @@ class Customer {
       [id]
     );
 
+    
     const customer = results.rows[0];
 
     if (customer === undefined) {
@@ -90,8 +91,8 @@ class Customer {
       err.status = 404;
       throw err;
     }
-
-    return new Customer(customer);
+    let newCustomer = new Customer(customer);
+    return newCustomer;
   }
 
   /** get all reservations for this customer. */
@@ -113,7 +114,7 @@ class Customer {
       this.id = result.rows[0].id;
     } else {
       await db.query(
-        `UPDATE customers SET first_name=$1, last_name=$2, phone=$3, notes=$4)
+        `UPDATE customers SET first_name=$1, last_name=$2, phone=$3, notes=$4
              WHERE id=$5`,
         [this.firstName, this.lastName, this.phone, this.notes, this.id]
       );

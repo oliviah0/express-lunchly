@@ -123,9 +123,14 @@ router.post("/:id/edit/", async function(req, res, next) {
     const phone = req.body.phone;
     const notes = req.body.notes;
 
-    const customer = new Customer({ firstName, lastName, phone, notes });
-    await customer.save();
+    const customer = await Customer.get(req.params.id);
 
+    customer.firstName = firstName;
+    customer.lastName = lastName;
+    customer.phone = phone;
+    customer.notes = notes;
+
+    await customer.save();
     return res.redirect(`/${customer.id}/`);
   } catch (err) {
     return next(err);
