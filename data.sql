@@ -332,3 +332,6 @@ SELECT pg_catalog.setval('public.reservations_id_seq', 200, true);
 
 CREATE INDEX reservations_customer_id_idx ON public.reservations USING btree (customer_id);
 CREATE INDEX reservations_start_at_idx ON public.reservations USING btree (start_at);
+
+UPDATE customers d1 SET customer_tokens = to_tsvector(CONCAT(d1.first_name, ' ', d1.last_name));
+
