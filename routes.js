@@ -14,8 +14,9 @@ const router = new express.Router();
 router.get("/", async function(req, res, next) {
   console.log('*******WE MADE IT TO !MAIN PAGE')
   try {
+    let title = "Customers"
     const customers = await Customer.all();
-    return res.render("customer_list.html", { customers });
+    return res.render("customer_list.html", { customers, title });
   } catch (err) {
     return next(err);
   }
@@ -23,9 +24,10 @@ router.get("/", async function(req, res, next) {
 
 router.get("/best-customers/", async function(req, res, next) {
   try {
+    let title = "Best Customers"
     let customers = await Customer.bestCustomers();
     console.log(customers)
-    return res.render("customer_list.html", { customers });
+    return res.render("customer_list.html", { customers, title});
   }
 
   catch (err) {
