@@ -7,9 +7,12 @@ const Reservation = require("./models/reservation");
 
 const router = new express.Router();
 
+
+
 /** Homepage: show list of customers. */
 
 router.get("/", async function(req, res, next) {
+  console.log('*******WE MADE IT TO !MAIN PAGE')
   try {
     const customers = await Customer.all();
     return res.render("customer_list.html", { customers });
@@ -18,9 +21,23 @@ router.get("/", async function(req, res, next) {
   }
 });
 
+router.get("/best-customers/", async function(req, res, next) {
+  try {
+    let customers = await Customer.bestCustomers();
+    console.log(customers)
+    return res.render("customer_list.html", { customers });
+  }
+
+  catch (err) {
+    return next(err);
+  }
+
+});
+
 /** Form to add a new customer. */
 
 router.get("/add/", async function(req, res, next) {
+  console.log('*******WE MADE IT TO !GET ADD PAGE')
   try {
     return res.render("customer_new_form.html");
   } catch (err) {
@@ -31,6 +48,7 @@ router.get("/add/", async function(req, res, next) {
 /** Handle adding a new customer. */
 
 router.post("/add/", async function(req, res, next) {
+  console.log('*******WE MADE IT TO !POST ADD PAGE')
   try {
     const firstName = req.body.firstName;
     const lastName = req.body.lastName;
@@ -46,9 +64,30 @@ router.post("/add/", async function(req, res, next) {
   }
 });
 
+/** Handle search results after searching customer 
+ * 
+ * Note to self: order matters, need to put the more specific routes first.
+ * Or else it will think the 'name' is an id
+*/
+router.get("/results/", async function(req, res, next) {
+  try {
+
+    const name = req.query.searchName
+    let customers = await Customer.searchByName(name)
+    return res.render("customer_list.html", { customers });
+  }
+  catch (err) {
+    return next(err);
+  }
+})
+
+
+
+
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function(req, res, next) {
+  console.log('*******WE MADE IT TO !ID GET')
   try {
     const customer = await Customer.get(req.params.id);
 
@@ -63,6 +102,7 @@ router.get("/:id/", async function(req, res, next) {
 /** Show form to edit a customer. */
 
 router.get("/:id/edit/", async function(req, res, next) {
+  console.log('*******WE MADE IT TO ~ID EDIT PAGE')
   try {
     const customer = await Customer.get(req.params.id);
 
@@ -112,5 +152,9 @@ router.post("/:id/add-reservation/", async function(req, res, next) {
     return next(err);
   }
 });
+
+
+
+
 
 module.exports = router;

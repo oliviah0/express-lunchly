@@ -14,6 +14,47 @@ class Customer {
     this.notes = notes;
   }
 
+  fullName() {
+    return `${this.firstName} ${this.lastName}`
+  }
+
+  static async bestCustomers() {
+    const results = await db.query(
+      `SELECT cust.id AS "id", 
+          cust.first_name AS "firstName", 
+          cust.last_name AS "lastName",
+          cust.phone AS "phone",
+          cust.notes AS "notes"
+        FROM reservations AS res
+        JOIN customers AS cust ON res.customer_id = cust.id
+        GROUP BY customer_id, cust.id, cust.first_name, cust.last_name, cust.phone, cust.notes
+        ORDER BY count(*) DESC
+        LIMIT 10`
+    )
+    console.log(results)
+    return results.rows.map(c => new Customer(c));
+
+  }
+
+  /** find all customers with specific name. */
+
+  static async searchByName(searchName) {
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes
+       FROM customers
+       WHERE first_name ILIKE $1 OR last_name ILIKE $1
+       ORDER BY last_name, first_name`,
+       [searchName]
+    );
+
+    return results.rows.map(c => new Customer(c));
+  }
+
+
   /** find all customers. */
 
   static async all() {
